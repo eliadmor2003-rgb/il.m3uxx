@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אימות אנושי - בדיקת אהבה</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f8f9fa; margin: 0; overflow: hidden; transition: background-color 1s; }
+        .captcha-box { background: white; padding: 20px; border: 1px solid #dfe1e5; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; z-index: 10; }
+        .header { background: #4285f4; color: white; margin: -20px -20px 15px -20px; padding: 15px; border-radius: 8px 8px 0 0; }
+        .header h2 { margin: 0; font-size: 16px; font-weight: 400; }
+        .header p { margin: 0; font-size: 22px; font-weight: bold; }
+        
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 15px; }
+        .grid img { width: 100%; height: 100px; object-fit: cover; cursor: pointer; border: 3px solid transparent; box-sizing: border-box; }
+        .grid img.selected { border-color: #4285f4; transform: scale(0.95); opacity: 0.8; }
+        
+        .footer { border-top: 1px solid #eee; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .btn { background: #4285f4; color: white; border: none; padding: 10px 24px; cursor: pointer; font-weight: bold; border-radius: 4px; text-transform: uppercase; }
+        .error-msg { color: #d93025; font-size: 13px; display: none; margin-bottom: 10px; font-weight: bold; }
+        
+        /* דף ההצלחה */
+        #success-page { display: none; text-align: center; z-index: 10; animation: fadeIn 2s; }
+        #success-page h1 { color: #d63384; font-size: 3rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        #success-page p { font-size: 1.8rem; color: #555; }
+
+        /* אפקט הלבבות */
+        .heart { position: absolute; top: -10%; color: #ff4d6d; font-size: 20px; pointer-events: none; animation: fall linear infinite; }
+        @keyframes fall {
+            to { transform: translateY(110vh) translateX(20px) rotate(360deg); }
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="captcha-container" class="captcha-box">
+        <div class="header">
+            <h2>יש לבחור את כל התמונות של</h2>
+            <p>אנשים שאת אוהבת</p>
+        </div>
+        <div id="error" class="error-msg">בבקשה תבחרי את כל התמונות שאת אוהבת...</div>
+        <div class="grid" id="imageGrid">
+            </div>
+        <div class="footer">
+            <span style="color: #777; font-size: 12px;">❤️ אימות אנושי</span>
+            <button class="btn" onclick="checkCaptcha()">אישור</button>
+        </div>
+    </div>
+
+    <div id="success-page">
+        <h1>בוקר טוב, אני אוהב אותך ❤️</h1>
+        <p>שיהיה לך יום מדהים!</p>
+    </div>
+
+    <script>
+        // חשוב: וודא ששמות הקבצים כאן תואמים בדיוק לשמות התמונות שאתה מעלה!
+        const images = [
+            { src: 'love1.jpg', correct: true },
+            { src: 'other1.jpg', correct: false },
+            { src: 'love2.jpg', correct: true },
+            { src: 'other2.jpg', correct: false },
+            { src: 'other3.jpg', correct: false },
+            { src: 'love3.jpg', correct: true },
+            { src: 'other4.jpg', correct: false },
+            { src: 'love4.jpg', correct: true },
+            { src: 'other5.jpg', correct: false }
+        ];
+
+        const grid = document.getElementById('imageGrid');
+
+        // ערבוב קל של התמונות כדי שזה ייראה אמיתי (אופציונלי)
+        images.forEach((imgData) => {
+            const img = document.createElement('img');
+            img.src = imgData.src;
+            img.dataset.correct = imgData.correct;
+            img.onclick = () => img.classList.toggle('selected');
+            grid.appendChild(img);
+        });
+
+        function checkCaptcha() {
+            const allImgs = document.querySelectorAll('.grid img');
+            let isCorrect = true;
+
+            allImgs.forEach(img => {
+                const isSelected = img.classList.contains('selected');
+                const shouldBeSelected = img.dataset.correct === "true";
+                if (isSelected !== shouldBeSelected) isCorrect = false;
+            });
+
+            if (isCorrect) {
+                startMagic();
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        function startMagic() {
+            document.getElementById('captcha-container').style.display = 'none';
+            document.getElementById('success-page').style.display = 'block';
+            document.body.style.backgroundColor = "#fff0f5";
+            
+            // יצירת לבבות נופלים
+            for (let i = 0; i < 50; i++) {
+                setTimeout(createHeart, i * 150);
+            }
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            heart.style.opacity = Math.random();
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 5000);
+        }
+    </script>
+</body>
